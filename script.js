@@ -78,23 +78,23 @@ function dataParserV3(text) {
         },
         'Grade': {
             type: 0,
-            matcher: ['GRADE']
+            matcher: ['GRADE',"Grade"]
         },
         'Grade Points': {
             type: 0,
-            matcher: ['GRADE POINTS']
+            matcher: ['GRADE POINTS', "Grade Points"]
         },
         'Credits': {
             type: 0,
-            matcher: ['CREDITS']
+            matcher: ['CREDITS', "Credits"]
         },
         'Obtained Credits': {
             type: 0,
-            matcher: ['OBTAINED CREDITS']
+            matcher: ['OBTAINED CREDITS', "Obtained Credits"]
         },
         'Credits Points': {
             type: 0,
-            matcher: ['CREDITS POINTS']
+            matcher: ['CREDITS POINTS', "Credits Points"]
         },
         'Course Credits': {
             type: 0,
