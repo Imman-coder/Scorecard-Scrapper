@@ -29,7 +29,7 @@ pbtn.onclick = (e) => {
 
 version.onchange = (e) => {
     if (DEBUG) console.log(e.target.value)
-    if(parsedData) pbtn.click()
+    if (parsedData) pbtn.click()
 }
 
 
@@ -50,7 +50,7 @@ function version1(text) {
     let cgpa = parsedData['CGPA']
     let name = parsedData['studentName']
 
-    
+
 
     //------- V1 -------//
 
@@ -171,7 +171,7 @@ Name:\t`+ name + `
 SGPA:\t`+ sgpa + `
 CGPA:\t`+ cgpa
 
-   if (DEBUG) console.log(keys)
+    if (DEBUG) console.log(keys)
 }
 
 
@@ -189,7 +189,7 @@ function version2(text) {
     let cgpa = parsedData['CGPA']
     let name = parsedData['studentName']
 
-    
+
 
     //----- V2 ------//
 
@@ -335,7 +335,7 @@ function version3(text) {
     let orderToShow = {
         'Course Name': {
             type: 0,
-            matcher: ['courseName']
+            matcher: ['course Name',"courseName"]
         },
         'Course Code': {
             type: 0,
@@ -405,45 +405,46 @@ function version3(text) {
         }
     }
 
-    // delete (pCol['totalExamMarks'])
-    // delete (pCol['subjectName'])
-
 
 
     for (const key in conf) {
-        keys[key] = conf[key].columnName
+        keys[conf[key].columnName] = key
     }
+    
+    for (let e in orderToShow) {
 
-    for (let i = 0; i < orderToShow.length; i++) {
+        if (orderToShow[e].type == 1) {
+            for (let i = 0; i < orderToShow[e].matchers.length; i++) {
 
-        if (orderToShow[i] instanceof Array) {
-            for (let j = 1; j < orderToShow[i].length; j++) {
-                let pos = Object.values(keys).indexOf(orderToShow[i][j])
-                if (pos > -1) {
-                    orderToShow[i][j] = Object.keys(keys)[pos]
+                let v = orderToShow[e].matchers[i].find(a => a in keys)
+
+                let pos = keys[v]
+                
+                if (pos) {
+                    orderToShow[e].matchers[i] = [pos]
                 }
             }
-        } else {
-            let pos = Object.values(keys).indexOf(orderToShow[i])
-            if (pos > -1) {
-                orderToShow[i] = Object.keys(keys)[pos]
+        } else if (orderToShow[e].type == 0) {
+            console.log(orderToShow[e].matcher)
+            let v = orderToShow[e].matcher.find(e => e in keys)
+
+            let pos = keys[v];
+            if (pos ) {
+                orderToShow[e].matcher = [pos]
             }
         }
 
+    };
 
-    }
+
 
     let dataForTable = '<tr>'
 
-    orderToShow.forEach(e => {
-        let vn
-        if (e instanceof Array) {
-            vn = e[0]
-        } else
-            vn = keys[e] ?? capitalizeAndSpace(e)
+    for (let e in orderToShow) {
+        dataForTable += `<th>` + e + `</th>`
+    };
 
-        dataForTable += `<th>` + vn + `</th>`
-    });
+    console.log(orderToShow)
 
     dataForTable += '</tr>'
 
@@ -459,27 +460,41 @@ function version3(text) {
             sgpa = it
         } else if (it) {
 
-            orderToShow.forEach(e => {
-                if (e instanceof Array) {
-                    let v1 = Math.trunc(it[e[1]])
-                    let v2 = Math.trunc(it[e[2]])
-                    let v3 = Math.trunc(it[e[3]])
+            
 
+            for (let e in orderToShow) {
+                if (orderToShow[e].type == 1) {
+
+                    const key1 = orderToShow[e].matchers[0].find(e => e in it)
+                    const key2 = orderToShow[e].matchers[1].find(e => e in it)
+                    const key3 = orderToShow[e].matchers[2].find(e => e in it)
+
+                    
+                    let v1 = Math.trunc(it[key1])
+                    let v2 = Math.trunc(it[key2])
+                    let v3 = Math.trunc(it[key3])
+                    
                     v1 = isNaN(v1) ? "-" : v1
                     v2 = isNaN(v2) ? "-" : v2
                     v3 = isNaN(v3) ? "-" : v3 + "%"
 
-                    let hl = (it[e[4]] ?? "").toLowerCase()
+                    let hl = (it[orderToShow[e].matchers[3]] ?? "").toLowerCase()
                     hl = (hl == "pass") ? "green" : (hl == "fail" ? "red" : "")
+
                     let vn = '' + v1 + " / " + v2 + " / " + v3
                     dataForTable += `<td class =` + hl + ` >` + vn + `</td>`
-                } else {
-                    let vn = it[e]
+
+                }
+                else if (orderToShow[e].type == 0) {
+
+                    let key = orderToShow[e].matcher.find(e => e in it)
+
+                    let vn = it[key]
 
                     dataForTable += `<td>` + vn + `</d>`
-                }
 
-            });
+                }
+            }
         }
 
         dataForTable += '</tr>'
